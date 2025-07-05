@@ -6,17 +6,39 @@ const token = process.env.BOT_TOKEN;
 // Ganti polling: true menjadi false jika ingin pakai webhook
 const bot = new TelegramBot(token, { polling: true });
 
-bot.on('message', async (msg) => {
+require('dotenv').config();
+const TelegramBot = require('node-telegram-bot-api');
+
+const token = process.env.BOT_TOKEN;
+const bot = new TelegramBot(token, { polling: true });
+
+bot.onText(/\/start/, (msg) => {
   const chatId = msg.chat.id;
-  const text = msg.text?.trim();
+  const firstName = msg.from.first_name;
 
-  if (text === '/start') {
-    return bot.sendMessage(chatId, `👋 Halo, ${msg.from.first_name}! Selamat datang di base Telegram Bot.`);
+  const opts = {
+    reply_markup: {
+      inline_keyboard: [
+        [{ text: 'Api Web Project', callback_data: 'apiproject' }],
+        [{ text: 'Saluran WhatsApp', url: 'https://whatsapp.com/channel/0029Vb6P2e1E50UZYaX4wI0W' }]
+      ]
+    }
+  };
+
+  bot.sendMessage(chatId, `👋 Halo *${firstName}*! Selamat datang di Vercel Team Bot.`, {
+    parse_mode: 'Markdown',
+    ...opts
+  });
+});
+
+// Handle button press (callback)
+bot.on('callback_query', (callbackQuery) => {
+  const data = callbackQuery.data;
+  const msg = callbackQuery.message;
+
+  if (data === 'apiproject') {
+    bot.sendMessage(msg.chat.id, `📋 Ini adalah menu utama.`);
   }
 
-  if (text === '/help') {
-    return bot.sendMessage(chatId, `📚 Command:\n/start - Mulai bot\n/help - Bantuan`);
-  }
-
-  return bot.sendMessage(chatId, `⚠️ Command tidak dikenali. Gunakan /help`);
+  // Kamu bisa tambah case callback lainnya di sini
 });
