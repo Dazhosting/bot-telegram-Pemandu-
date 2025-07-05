@@ -35,10 +35,51 @@ bot.onText(/\/start/, (msg) => {
 bot.on('callback_query', (callbackQuery) => {
   const data = callbackQuery.data;
   const msg = callbackQuery.message;
+  const chatId = msg.chat.id;
 
   if (data === 'apiproject') {
-    bot.sendMessage(msg.chat.id, `📋 Ini adalah menu utama.`);
+    const opts = {
+      reply_markup: {
+        inline_keyboard: [
+          [{ text: 'Ai Generator Puisi', callback_data: 'project_1' }],
+        ]
+      }
+    };
+
+    return bot.sendMessage(chatId, `📂 *List Project Vercel Team*\nPilih project untuk ambil API-nya:`, {
+      parse_mode: 'Markdown',
+      ...opts
+    });
   }
 
-  // Kamu bisa tambah case callback lainnya di sini
+  // Callback dari tombol dalam apiproject
+  if (data === 'project_1') {
+    return bot.sendMessage(chatId, `
+✅ Ini URL API Untuk mengambil Data Api Generator Puisi` + "```JavaScript\n" + `
+      const data = {
+      topic: formData.get('topic'),
+      type: formData.get('type'),
+      lang: formData.get('lang'),
+      length: formData.get('length'),
+    };
+
+    try {
+      const response = await fetch('/api/generate-poem', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+      ` + "```", {
+      parse_mode: 'Markdown'
+    });
+  }
+
+  if (data === 'project_b') {
+    return bot.sendMessage(chatId, `✅ Ini API untuk *Project B*:\n\`https://vercel-api.example.com/project-b\``, {
+      parse_mode: 'Markdown'
+    });
+  }
+
+  // fallback
+  bot.sendMessage(chatId, '⚠️ Perintah tidak dikenali.');
 });
